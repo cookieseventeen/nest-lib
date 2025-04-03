@@ -49,6 +49,13 @@ DATABASE_URL="your_database_url"
 JWT_SECRET="your_jwt_secret"
 ```
 
+## 建立 Prisma 資料庫
+在專案根目錄執行以下指令以建立 Prisma 資料庫：
+
+```bash
+$ npx prisma db push
+```
+
 ## 編譯並執行專案
 
 ```bash
