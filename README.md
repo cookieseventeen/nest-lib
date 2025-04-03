@@ -31,10 +31,13 @@
 $ npm install
 ```
 
-## init db
+## Environment variables
+Create a `.env` file in the root directory of your project and add the following environment variables:
 
 ```bash
-$ npx prisma db push
+
+DATABASE_URL="your_database_url"
+JWT_SECRET="your_jwt_secret"
 ```
 
 ## Compile and run the project
