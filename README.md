@@ -5,103 +5,112 @@
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+  <p align="center">一個漸進式的 <a href="http://nodejs.org" target="_blank">Node.js</a> 框架，用於建構高效且具延展性的伺服器端應用程式。</p>
     <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM 版本" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="套件授權" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM 下載量" /></a>
 <a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
 <a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Open Collective 贊助者" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Open Collective 贊助商" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="贊助我們"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="支持我們"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="在 Twitter 上關注我們"></a>
 </p>
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## 準備資料庫
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+您可以使用以下連結中的 `docker-compose.yml` 檔案快速建立資料庫環境：[docker-compose.yml](https://github.com/cookieseventeen/DockerFileKeep/blob/main/nest-lib/docker-compose.yml)
 
-## Project setup
+執行以下指令啟動資料庫：
+
+```bash
+docker compose up -d
+```
+
+## 專案描述
+
+[Nest](https://github.com/nestjs/nest) 框架 TypeScript 入門專案庫。
+
+## 專案設定
 
 ```bash
 $ npm install
 ```
 
-## Environment variables
-Create a `.env` file in the root directory of your project and add the following environment variables:
+## 環境變數
+在專案根目錄建立一個 `.env` 檔案，並加入以下環境變數：
 
 ```bash
-
 DATABASE_URL="your_database_url"
 JWT_SECRET="your_jwt_secret"
 ```
 
-## Compile and run the project
+## 編譯並執行專案
 
 ```bash
-# development
+# 開發模式
 $ npm run start
 
-# watch mode
+# 監控模式
 $ npm run start:dev
 
-# production mode
+# 生產模式
 $ npm run start:prod
 ```
 
-## Run tests
+## 執行測試
 
 ```bash
-# unit tests
+# 單元測試
 $ npm run test
 
-# e2e tests
+# 端對端測試
 $ npm run test:e2e
 
-# test coverage
+# 測試覆蓋率
 $ npm run test:cov
 ```
 
-## Deployment
+## 部署
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+當您準備好將 NestJS 應用程式部署到生產環境時，有一些關鍵步驟可以確保它能夠以最高效率執行。查看[部署文件](https://docs.nestjs.com/deployment)以獲取更多資訊。
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+如果您正在尋找一個雲端平台來部署您的 NestJS 應用程式，請查看 [Mau](https://mau.nestjs.com)，這是我們在 AWS 上部署 NestJS 應用程式的官方平台。Mau 使部署變得簡單快速，只需幾個簡單步驟：
 
 ```bash
 $ npm install -g mau
 $ mau deploy
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+使用 Mau，您只需點擊幾下就可以部署應用程式，讓您專注於建構功能而不是管理基礎設施。
 
-## Resources
+## 資源
 
-Check out a few resources that may come in handy when working with NestJS:
+以下是一些在使用 NestJS 時可能會派上用場的資源：
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- 訪問 [NestJS 文件](https://docs.nestjs.com) 了解更多關於框架的資訊。
+- 如有問題和支援需求，請訪問我們的 [Discord 頻道](https://discord.gg/G7Qnnhy)。
+- 要深入了解並獲得更多實踐經驗，請查看我們的官方[教學課程](https://courses.nestjs.com/)。
+- 使用 [NestJS Mau](https://mau.nestjs.com) 只需點擊幾下就能將應用程式部署到 AWS。
+- 使用 [NestJS Devtools](https://devtools.nestjs.com) 視覺化您的應用程式圖表並與 NestJS 應用程式實時互動。
+- 需要專案幫助（兼職到全職）？查看我們的官方[企業支援](https://enterprise.nestjs.com)。
+- 要獲取最新資訊和更新，請在 [X](https://x.com/nestframework) 和 [LinkedIn](https://linkedin.com/company/nestjs) 上關注我們。
+- 尋找工作，或有工作機會提供？查看我們的官方[工作看板](https://jobs.nestjs.com)。
 
-## Support
+## 支援
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Nest 是一個採用 MIT 授權的開源專案。它能夠成長要歸功於贊助商和眾多支持者。如果您想加入他們，請[閱讀更多](https://docs.nestjs.com/support)。
 
-## Stay in touch
+## 保持聯繫
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
+- 作者 - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- 網站 - [https://nestjs.com](https://nestjs.com/)
 - Twitter - [@nestframework](https://twitter.com/nestframework)
 
-## License
+## 授權
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Nest 採用 [MIT 授權](https://github.com/nestjs/nest/blob/master/LICENSE)。
