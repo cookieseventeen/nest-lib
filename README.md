@@ -56,6 +56,11 @@ JWT_SECRET="your_jwt_secret"
 $ npx prisma db push
 ```
 
+## 查看資料庫
+```bash
+$ npx prisma studio
+```
+
 ## 編譯並執行專案
 
 ```bash
