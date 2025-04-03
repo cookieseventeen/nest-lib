@@ -31,6 +31,12 @@
 $ npm install
 ```
 
+## init db
+
+```bash
+$ npx prisma db push
+```
+
 ## Compile and run the project
 
 ```bash
