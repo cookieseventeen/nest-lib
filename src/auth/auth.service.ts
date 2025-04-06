@@ -16,8 +16,8 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException('Invalid credentials');
+    if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
+      throw new UnauthorizedException('無效的認證資料');
     }
 
     const payload = { sub: user.id, email: user.email };

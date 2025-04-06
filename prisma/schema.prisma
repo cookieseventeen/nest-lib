@@ -15,9 +15,30 @@ datasource db {
 
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String
-  createdAt DateTime @default(now())
+  id             Int                @id @default(autoincrement())
+  email          String             @unique
+  password       String?            // 可以為 null (SSO 使用者)
+  name           String
+  firstName      String?
+  lastName       String?
+  profilePicture String?
+  role           String             @default("user")
+  provider       String?            // 主要 SSO 提供者
+  providerId     String?            // 主要提供者 ID
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  ssoConnections UserSsoConnection[]
+}
+
+// 儲存使用者的多個 SSO 連結
+model UserSsoConnection {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  provider   String   // 'google', 'facebook', 'github' 等
+  providerId String   // 外部提供者的使用者 ID
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, provider])
 }

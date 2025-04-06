@@ -4,12 +4,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SsoModule } from './sso/sso.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     AuthModule, 
-    PrismaModule
+    PrismaModule,
+    SsoModule
   ],
   controllers: [AppController],
   providers: [AppService],
