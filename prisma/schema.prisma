@@ -42,3 +42,19 @@ model UserSsoConnection {
 
   @@unique([userId, provider])
 }
+
+// 儲存影片資訊
+model Video {
+  id          Int      @id @default(autoincrement())
+  title       String
+  originalUrl String
+  filePath    String
+  fileName    String
+  fileSize    Int?
+  format      String?
+  duration    Int?     // 影片長度（秒）
+  userId      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+}

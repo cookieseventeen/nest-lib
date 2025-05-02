@@ -5,13 +5,15 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { SsoModule } from './sso/sso.module';
+import { VideoModule } from './video/video.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     AuthModule, 
     PrismaModule,
-    SsoModule
+    SsoModule,
+    VideoModule
   ],
   controllers: [AppController],
   providers: [AppService],

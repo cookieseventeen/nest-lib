@@ -1,0 +1,72 @@
+{
+  "info": {
+    "name": "簡易影片下載API測試",
+    "_postman_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+    "description": "用於測試簡易影片下載API的Postman Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "下載單一影片",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"urls\": [\n    \"https://www.youtube.com/watch?v=NUUJ2PXdEH0&pp=ygUG6LWk5Ly2\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/simple-videos/download",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "simple-videos",
+            "download"
+          ]
+        },
+        "description": "使用簡易影片下載API下載單一YouTube影片"
+      },
+      "response": []
+    },
+    {
+      "name": "批次下載多個影片",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"urls\": [\n    \"https://www.youtube.com/watch?v=NUUJ2PXdEH0&pp=ygUG6LWk5Ly2\",\n    \"https://www.youtube.com/watch?v=DGu2j9RUqNI\",\n    \"https://www.youtube.com/watch?v=h8OX0FNWANM\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/simple-videos/download",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "simple-videos",
+            "download"
+          ]
+        },
+        "description": "使用簡易影片下載API批次下載多個YouTube影片"
+      },
+      "response": []
+    }
+  ]
+}
