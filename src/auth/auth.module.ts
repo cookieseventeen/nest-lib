@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthCleanupService } from './auth-cleanup.service';
 
 @Module({
   imports: [
@@ -11,8 +12,8 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, AuthCleanupService],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, AuthCleanupService],
 })
 export class AuthModule {}

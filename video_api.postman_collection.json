@@ -1,0 +1,148 @@
+{
+  "info": {
+    "_postman_id": "video-api-collection-20250504",
+    "name": "Video API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for Video API endpoints."
+  },
+  "item": [
+    {
+      "name": "認證",
+      "item": [
+        {
+          "name": "用戶註冊",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"測試用戶\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "用戶登入",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "下載影片",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=xxxxxxx\",\n  \"type\": \"mp4\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/videos/download",
+          "host": ["{{baseUrl}}"],
+          "path": ["videos", "download"]
+        }
+      }
+    },
+    {
+      "name": "取得所有影片",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/videos",
+          "host": ["{{baseUrl}}"],
+          "path": ["videos"]
+        }
+      }
+    },
+    {
+      "name": "取得單一影片資訊",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/videos/:id",
+          "host": ["{{baseUrl}}"],
+          "path": ["videos", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1", 
+              "description": "影片ID"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "串流播放影片",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/videos/stream/:id",
+          "host": ["{{baseUrl}}"],
+          "path": ["videos", "stream", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1",
+              "description": "影片ID"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 全局測試腳本",
+          "if (pm.response.code === 200 || pm.response.code === 201) {",
+          "    if (pm.response.json() && pm.response.json().access_token) {",
+          "        pm.environment.set('jwt', pm.response.json().access_token);",
+          "        console.log('JWT token 已保存！');",
+          "    }",
+          "}",
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "jwt", "value": "<your-jwt-token>" }
+  ]
+}

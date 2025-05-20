@@ -22,16 +22,26 @@ export class VideoService {
   }
 
   async downloadVideo(userId: number, downloadDto: DownloadVideoDto) {
-    const { url } = downloadDto;
+    const { url, type } = downloadDto;
+    const formatType = type || 'mp4'; // 預設 mp4
+    
+    console.log('Downloading video for userId:', userId);
+
+    if (!userId || isNaN(userId)) {
+      throw new HttpException(
+        'Invalid user ID provided: ' + userId,
+        HttpStatus.BAD_REQUEST
+      );
+    }
 
     try {
       // 建立唯一檔名
       const videoId = uuidv4();
-      const fileName = `${videoId}.mp4`;
+      const fileName = `${videoId}.${formatType}`;
       const filePath = path.join(this.videoDir, fileName);
 
-      // 使用 yt-dlp 下載影片
-      const cmd = `yt-dlp -o "${filePath}" "${url}"`;
+      // 使用 yt-dlp 下載影片，根據 type 決定格式
+      const cmd = `yt-dlp -o "${filePath}" -f "best[ext=${formatType}]/best" "${url}"`;
       console.log(`執行命令: ${cmd}`);
       
       const { stdout } = await execPromise(cmd);
@@ -53,8 +63,12 @@ export class VideoService {
           filePath,
           fileName,
           fileSize,
-          format: 'mp4',
-          userId,
+          format: formatType,
+          user: {
+            connect: {
+              id: userId
+            }
+          }
         },
       });
 
@@ -76,6 +90,17 @@ export class VideoService {
   async getVideoById(id: number) {
     const video = await this.prisma.video.findUnique({
       where: { id },
+      include: { 
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profilePicture: true,
+            // 只返回必要的用戶公開資料
+            // 敏感資料如 email、password 等不返回
+          }
+        }
+      },
     });
 
     if (!video) {
@@ -86,7 +111,7 @@ export class VideoService {
   }
 
   async getAllVideos(userId?: number) {
-    const where = userId ? { userId } : {};
+    const where = userId ? { user: { id: userId } } : {};
     
     const videos = await this.prisma.video.findMany({
       where,

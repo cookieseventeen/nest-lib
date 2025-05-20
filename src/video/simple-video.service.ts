@@ -1,4 +1,3 @@
-// filepath: /Users/xiebingqi/Documents/mylab/nest-lib/src/video/simple-video.service.ts
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { SimpleDownloadVideoDto } from './dto/simple-download-video.dto';
 import { exec } from 'child_process';
@@ -26,10 +25,11 @@ export class SimpleVideoService {
   }
 
   async downloadVideos(downloadDto: SimpleDownloadVideoDto) {
-    const { urls } = downloadDto;
+    const { urls, type } = downloadDto;
     const totalVideos = urls.length;
+    const formatType = type || 'mp4'; // 預設 mp4
     
-    console.log(`開始下載 ${totalVideos} 個影片，最大平行處理數：${this.maxConcurrentDownloads}`);
+    console.log(`開始下載 ${totalVideos} 個影片，最大平行處理數：${this.maxConcurrentDownloads}，格式：${formatType}`);
     
     // 為此次下載操作建立唯一的資料夾，使用第一個影片的名稱
     const firstVideoInfo = await this.getVideoInfo(urls[0]);
@@ -59,7 +59,7 @@ export class SimpleVideoService {
     // 將 URLs 分批處理，每批最多同時處理 maxConcurrentDownloads 個下載
     for (let i = 0; i < totalVideos; i += this.maxConcurrentDownloads) {
       const batch = urls.slice(i, i + this.maxConcurrentDownloads);
-      const batchPromises = batch.map(url => this.downloadSingleVideo(url, downloadFolderPath, results.details));
+      const batchPromises = batch.map(url => this.downloadSingleVideo(url, downloadFolderPath, results.details, formatType));
       downloadBatches.push(Promise.all(batchPromises));
     }
     
@@ -73,7 +73,7 @@ export class SimpleVideoService {
     return results;
   }
   
-  private async downloadSingleVideo(url: string, folderPath: string, details: any[]): Promise<{success: boolean, url: string, path?: string, error?: string}> {
+  private async downloadSingleVideo(url: string, folderPath: string, details: any[], formatType = 'mp4'): Promise<{success: boolean, url: string, path?: string, error?: string}> {
     try {
       // 先檢查影片是否可用
       const videoInfo = await this.getVideoInfo(url);
@@ -94,9 +94,9 @@ export class SimpleVideoService {
       const cleanTitle = this.sanitizeFilename(videoInfo.title);
       const outputTemplate = `${folderPath}/${cleanTitle}`;
 
-      // 使用 yt-dlp 下載影片，使用模板輸出檔名，指定格式與解析度偏好
-      // 優先選擇 mp4 格式，但允許其他格式
-      const cmd = `yt-dlp -o "${outputTemplate}.%(ext)s" -f "best[ext=mp4]/best" --no-playlist --no-warnings "${url}"`;
+      // 使用 yt-dlp 下載影片，根據 type 決定格式
+      // ex: -f "best[ext=mp4]/best" 或 "best[ext=webm]/best"
+      const cmd = `yt-dlp -o "${outputTemplate}.%(ext)s" -f "best[ext=${formatType}]/best" --no-playlist --no-warnings "${url}"`;
       console.log(`執行命令: ${cmd} - 開始下載: ${url}`);
       
       const { stdout } = await execPromise(cmd);
@@ -132,7 +132,6 @@ export class SimpleVideoService {
       // 列出資料夾中的所有檔案，協助除錯
       console.error(`資料夾 ${folderPath} 的內容:`, fs.readdirSync(folderPath));
       throw new Error(`檔案下載失敗或找不到檔案 (清楚標題: ${cleanTitle})`);
-      
       
     } catch (error) {
       console.error(`下載影片失敗 [${url}]:`, error.message);

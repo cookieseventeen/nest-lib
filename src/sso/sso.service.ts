@@ -94,7 +94,7 @@ export class SsoService {
             profilePicture: sanitizedData.picture || '',
             provider: sanitizedData.provider,
             providerId: sanitizedData.providerId,
-            role: 'user', // 預設角色
+            role: 'USER', // 預設角色
           },
         });
       } 

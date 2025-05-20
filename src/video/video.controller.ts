@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Param, Body, UseGuards, Req, Res, HttpStatus, StreamableFile } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, UseGuards, Req, Res, HttpStatus, StreamableFile, HttpException } from '@nestjs/common';
 import { VideoService } from './video.service';
 import { DownloadVideoDto } from './dto/download-video.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -12,6 +12,9 @@ export class VideoController {
   @UseGuards(JwtAuthGuard)
   async downloadVideo(@Req() req, @Body() downloadDto: DownloadVideoDto) {
     const userId = req.user.id;
+    if (!userId) {
+      throw new HttpException('User ID not found in token', HttpStatus.UNAUTHORIZED);
+    }
     return this.videoService.downloadVideo(userId, downloadDto);
   }
 
@@ -20,6 +23,9 @@ export class VideoController {
   async getAllVideos(@Req() req) {
     // 只獲取自己的影片
     const userId = req.user.id;
+    if (!userId) {
+      throw new HttpException('User ID not found in token', HttpStatus.UNAUTHORIZED);
+    }
     return this.videoService.getAllVideos(userId);
   }
 

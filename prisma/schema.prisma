@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
 
 model User {
   id             Int                @id @default(autoincrement())
@@ -22,12 +27,13 @@ model User {
   firstName      String?
   lastName       String?
   profilePicture String?
-  role           String             @default("user")
+  role           Role               @default(USER)
   provider       String?            // 主要 SSO 提供者
   providerId     String?            // 主要提供者 ID
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   ssoConnections UserSsoConnection[]
+  videos         Video[]            @relation("UserVideos", onDelete: Cascade)
 }
 
 // 儲存使用者的多個 SSO 連結
@@ -56,5 +62,5 @@ model Video {
   userId      Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation("UserVideos", fields: [userId], references: [id], onDelete: Cascade)
 }
