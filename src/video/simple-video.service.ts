@@ -94,9 +94,19 @@ export class SimpleVideoService {
       const cleanTitle = this.sanitizeFilename(videoInfo.title);
       const outputTemplate = `${folderPath}/${cleanTitle}`;
 
-      // 使用 yt-dlp 下載影片，根據 type 決定格式
-      // ex: -f "best[ext=mp4]/best" 或 "best[ext=webm]/best"
-      const cmd = `yt-dlp -o "${outputTemplate}.%(ext)s" -f "best[ext=${formatType}]/best" --no-playlist --no-warnings "${url}"`;
+      // 改善格式選擇策略，加入多個備援選項
+      const formatSelectors = [
+        `best[ext=${formatType}][height<=1080]`,  // 首選：指定格式，限制解析度
+        `best[ext=${formatType}]`,                // 備援1：指定格式
+        `best[height<=1080]`,                     // 備援2：任意格式，限制解析度
+        `best`,                                   // 備援3：最佳品質
+        `worst`                                   // 最後備援：最低品質
+      ];
+      
+      const formatString = formatSelectors.join('/');
+      
+      // 使用改良的 yt-dlp 命令，加入更多參數來處理 YouTube 問題
+      const cmd = `yt-dlp -o "${outputTemplate}.%(ext)s" -f "${formatString}" --no-playlist --no-warnings --ignore-errors --no-check-certificate --user-agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" "${url}"`;
       console.log(`執行命令: ${cmd} - 開始下載: ${url}`);
       
       const { stdout } = await execPromise(cmd);
@@ -136,10 +146,65 @@ export class SimpleVideoService {
     } catch (error) {
       console.error(`下載影片失敗 [${url}]:`, error.message);
       
+      // 如果是格式問題，嘗試最基本的下載
+      if (error.message.includes('Requested format is not available') || 
+          error.message.includes('nsig extraction failed')) {
+        console.log(`嘗試基本格式下載: ${url}`);
+        return this.downloadWithBasicFormat(url, folderPath, details);
+      }
+      
       const result = {
         success: false,
         url: url,
         error: error.message || '下載過程中發生未知錯誤'
+      };
+      
+      details.push(result);
+      return result;
+    }
+  }
+  
+  // 基本格式下載作為備援
+  private async downloadWithBasicFormat(url: string, folderPath: string, details: any[]): Promise<{success: boolean, url: string, path?: string, error?: string}> {
+    try {
+      const videoInfo = await this.getVideoInfo(url);
+      const cleanTitle = this.sanitizeFilename(videoInfo.title);
+      const outputTemplate = `${folderPath}/${cleanTitle}`;
+      
+      // 使用最基本的下載命令，不指定格式
+      const cmd = `yt-dlp -o "${outputTemplate}.%(ext)s" --no-playlist --no-warnings --ignore-errors --no-check-certificate "${url}"`;
+      console.log(`基本格式下載: ${cmd}`);
+      
+      await execPromise(cmd);
+      
+      // 檢查下載結果
+      const files = fs.readdirSync(folderPath);
+      const downloadedFile = files.find(file => file.startsWith(cleanTitle));
+      
+      if (downloadedFile) {
+        const actualFilePath = path.join(folderPath, downloadedFile);
+        if (fs.existsSync(actualFilePath)) {
+          const result = {
+            success: true,
+            url: url,
+            title: videoInfo.title,
+            path: actualFilePath,
+            fileName: downloadedFile,
+            note: '使用基本格式下載'
+          };
+          
+          details.push(result);
+          return result;
+        }
+      }
+      
+      throw new Error('基本格式下載也失敗');
+      
+    } catch (error) {
+      const result = {
+        success: false,
+        url: url,
+        error: `所有下載方式都失敗: ${error.message}`
       };
       
       details.push(result);
