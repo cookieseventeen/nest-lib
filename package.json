@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "ldb":"npx prisma studio",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -26,7 +27,7 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
-    "@prisma/client": "^6.5.0",
+    "@prisma/client": "^6.8.2",
     "@types/uuid": "^10.0.0",
     "axios": "^1.9.0",
     "bcrypt": "^5.1.1",

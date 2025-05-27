@@ -1,0 +1,652 @@
+{
+  "info": {
+    "name": "YouTube 播放清單下載 API - 完整測試集合",
+    "description": "完整的 YouTube 播放清單下載功能測試集合，包含驗證、影片下載、播放清單管理等功能",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "playlist_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "video_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01. 驗證功能",
+      "item": [
+        {
+          "name": "註冊新使用者",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"註冊成功\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"回應包含使用者資訊\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "    pm.expect(jsonData.user).to.have.property('id');",
+                  "    pm.expect(jsonData.user).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test.playlist@example.com\",\n  \"password\": \"Test123456!\",\n  \"name\": \"播放清單測試使用者\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "使用者登入",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"登入成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"取得 JWT Token\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.access_token);",
+                  "    pm.collectionVariables.set('user_id', jsonData.user.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test.playlist@example.com\",\n  \"password\": \"Test123456!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. 播放清單下載功能",
+      "item": [
+        {
+          "name": "下載 YouTube 播放清單（宮崎駿音樂）",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"播放清單下載成功\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"回應包含播放清單和影片資訊\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('playlist');",
+                  "    pm.expect(jsonData).to.have.property('videos');",
+                  "    pm.expect(jsonData.playlist).to.have.property('id');",
+                  "    pm.expect(jsonData.playlist.title).to.include('合集');",
+                  "    pm.collectionVariables.set('playlist_id', jsonData.playlist.id);",
+                  "    if (jsonData.videos.length > 0) {",
+                  "        pm.collectionVariables.set('video_id', jsonData.videos[0].id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.youtube.com/playlist?list=PLrAKf1sIcnV2mW5Sf8QrVfhvB9K8pOT-B\",\n  \"type\": \"mp4\",\n  \"playlistTitle\": \"宮崎駿經典音樂合集\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/playlists/download",
+              "host": ["{{base_url}}"],
+              "path": ["playlists", "download"]
+            }
+          }
+        },
+        {
+          "name": "下載播放清單（不指定標題，使用預設命名）",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"播放清單下載成功\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"使用預設標題命名\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.playlist.title).to.include('合集');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.youtube.com/playlist?list=PLQkQw3JIqUaHhIBF9M3rwv_W7o4U_1t3a\",\n  \"type\": \"mp4\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/playlists/download",
+              "host": ["{{base_url}}"],
+              "path": ["playlists", "download"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. 自動檢測下載功能",
+      "item": [
+        {
+          "name": "自動檢測 - 播放清單 URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"自動檢測播放清單成功\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"正確識別為播放清單\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('playlist');",
+                  "    pm.expect(jsonData).to.have.property('videos');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLrAKf1sIcnV2mW5Sf8QrVfhvB9K8pOT-B\",\n  \"type\": \"mp4\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/videos/download-auto",
+              "host": ["{{base_url}}"],
+              "path": ["videos", "download-auto"]
+            }
+          }
+        },
+        {
+          "name": "自動檢測 - 單一影片 URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"自動檢測單一影片成功\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"正確識別為單一影片\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('title');",
+                  "    pm.expect(jsonData).to.not.have.property('playlist');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n  \"type\": \"mp4\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/videos/download-auto",
+              "host": ["{{base_url}}"],
+              "path": ["videos", "download-auto"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. 播放清單管理功能",
+      "item": [
+        {
+          "name": "獲取所有播放清單",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"成功獲取播放清單列表\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"回應是陣列格式\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"播放清單包含必要資訊\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.length > 0) {",
+                  "        const playlist = jsonData[0];",
+                  "        pm.expect(playlist).to.have.property('id');",
+                  "        pm.expect(playlist).to.have.property('title');",
+                  "        pm.expect(playlist).to.have.property('videos');",
+                  "        pm.expect(playlist).to.have.property('_count');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/playlists",
+              "host": ["{{base_url}}"],
+              "path": ["playlists"]
+            }
+          }
+        },
+        {
+          "name": "獲取特定播放清單詳情",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"成功獲取播放清單詳情\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"播放清單詳情完整\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('title');",
+                  "    pm.expect(jsonData).to.have.property('videos');",
+                  "    pm.expect(jsonData.videos).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"影片順序正確\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.videos.length > 1) {",
+                  "        for (let i = 0; i < jsonData.videos.length - 1; i++) {",
+                  "            pm.expect(jsonData.videos[i].order).to.be.lessThan(jsonData.videos[i + 1].order);",
+                  "        }",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/playlists/{{playlist_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["playlists", "{{playlist_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. 影片管理功能",
+      "item": [
+        {
+          "name": "獲取所有影片（包含播放清單影片）",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"成功獲取影片列表\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"影片列表包含播放清單資訊\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    ",
+                  "    // 檢查是否有播放清單影片",
+                  "    const playlistVideos = jsonData.filter(video => video.playlist !== null);",
+                  "    if (playlistVideos.length > 0) {",
+                  "        const video = playlistVideos[0];",
+                  "        pm.expect(video.playlist).to.have.property('id');",
+                  "        pm.expect(video.playlist).to.have.property('title');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/videos",
+              "host": ["{{base_url}}"],
+              "path": ["videos"]
+            }
+          }
+        },
+        {
+          "name": "獲取特定影片詳情",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"成功獲取影片詳情\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"影片詳情完整\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('title');",
+                  "    pm.expect(jsonData).to.have.property('filePath');",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/videos/{{video_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["videos", "{{video_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. 影片串流功能",
+      "item": [
+        {
+          "name": "串流播放影片",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"影片串流成功\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"回應是影片檔案\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('video');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/videos/stream/{{video_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["videos", "stream", "{{video_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07. 錯誤處理測試",
+      "item": [
+        {
+          "name": "無效的播放清單 URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"正確處理無效 URL\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"回應包含錯誤訊息\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"invalid-url\",\n  \"type\": \"mp4\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/playlists/download",
+              "host": ["{{base_url}}"],
+              "path": ["playlists", "download"]
+            }
+          }
+        },
+        {
+          "name": "未授權存取播放清單",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"正確處理未授權存取\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/playlists",
+              "host": ["{{base_url}}"],
+              "path": ["playlists"]
+            }
+          }
+        },
+        {
+          "name": "存取不存在的播放清單",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"正確處理不存在的資源\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/playlists/99999",
+              "host": ["{{base_url}}"],
+              "path": ["playlists", "99999"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

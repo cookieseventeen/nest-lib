@@ -5,6 +5,8 @@
 
 /uploads
 
+/frontend-demo
+
 # Logs
 logs
 *.log

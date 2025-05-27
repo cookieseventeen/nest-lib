@@ -1,0 +1,120 @@
+{
+  "info": {
+    "name": "播放清單 API 測試",
+    "description": "測試 YouTube 播放清單下載功能的 API",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "下載播放清單",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://www.youtube.com/playlist?list=PLrAKf1sIcnV2mW5Sf8QrVfhvB9K8pOT-B\",\n  \"type\": \"mp4\",\n  \"playlistTitle\": \"測試播放清單合集\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/videos/download-playlist",
+          "host": ["{{base_url}}"],
+          "path": ["videos", "download-playlist"]
+        }
+      }
+    },
+    {
+      "name": "自動檢測下載",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=VIDEO_ID&list=PLAYLIST_ID\",\n  \"type\": \"mp4\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/videos/download-auto",
+          "host": ["{{base_url}}"],
+          "path": ["videos", "download-auto"]
+        }
+      }
+    },
+    {
+      "name": "獲取所有播放清單",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/videos/playlists",
+          "host": ["{{base_url}}"],
+          "path": ["videos", "playlists"]
+        }
+      }
+    },
+    {
+      "name": "獲取特定播放清單",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/videos/playlists/1",
+          "host": ["{{base_url}}"],
+          "path": ["videos", "playlists", "1"]
+        }
+      }
+    },
+    {
+      "name": "獲取所有影片（包含播放清單影片）",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/videos",
+          "host": ["{{base_url}}"],
+          "path": ["videos"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "jwt_token",
+      "value": "YOUR_JWT_TOKEN_HERE"
+    }
+  ]
+}

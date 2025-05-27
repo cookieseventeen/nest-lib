@@ -1,6 +1,8 @@
-import { Controller, Post, Get, Param, Body, UseGuards, Req, Res, HttpStatus, StreamableFile, HttpException, Logger } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, UseGuards, Req, Res, HttpStatus, StreamableFile, HttpException, Logger, Inject } from '@nestjs/common';
 import { VideoService } from './video.service';
+import { PlaylistService } from './playlist.service';
 import { DownloadVideoDto } from './dto/download-video.dto';
+import { DownloadPlaylistDto } from './dto/download-playlist.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Response } from 'express';
 import * as fs from 'fs';
@@ -11,7 +13,10 @@ import { statSync } from 'fs';
 export class VideoController {
   private readonly logger = new Logger(VideoController.name);
   
-  constructor(private readonly videoService: VideoService) {}
+  constructor(
+    private readonly videoService: VideoService,
+    private readonly playlistService: PlaylistService
+  ) {}
 
   @Post('download')
   @UseGuards(JwtAuthGuard)
@@ -23,6 +28,36 @@ export class VideoController {
     return this.videoService.downloadVideo(userId, downloadDto);
   }
 
+  @Post('download-playlist')
+  @UseGuards(JwtAuthGuard)
+  async downloadPlaylist(@Req() req, @Body() downloadDto: DownloadPlaylistDto) {
+    const userId = req.user.id;
+    if (!userId) {
+      throw new HttpException('User ID not found in token', HttpStatus.UNAUTHORIZED);
+    }
+    return this.videoService.downloadPlaylist(userId, downloadDto);
+  }
+
+  @Post('download-auto')
+  @UseGuards(JwtAuthGuard)
+  async downloadVideoOrPlaylist(@Req() req, @Body() downloadDto: DownloadVideoDto) {
+    const userId = req.user.id;
+    if (!userId) {
+      throw new HttpException('User ID not found in token', HttpStatus.UNAUTHORIZED);
+    }
+    
+    const { url } = downloadDto;
+    const isPlaylist = this.playlistService.isPlaylistUrl(url);
+    
+    if (isPlaylist) {
+      console.log('檢測到播放清單 URL，執行播放清單下載');
+      return this.playlistService.downloadPlaylist(userId, downloadDto as DownloadPlaylistDto);
+    } else {
+      console.log('檢測到單一影片 URL，執行單一影片下載');
+      return this.videoService.downloadVideo(userId, downloadDto);
+    }
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
   async getAllVideos(@Req() req) {
@@ -32,6 +67,16 @@ export class VideoController {
       throw new HttpException('User ID not found in token', HttpStatus.UNAUTHORIZED);
     }
     return this.videoService.getAllVideos(userId);
+  }
+
+  @Get('playlists')
+  @UseGuards(JwtAuthGuard)
+  async getAllPlaylists(@Req() req) {
+    const userId = req.user.id;
+    if (!userId) {
+      throw new HttpException('User ID not found in token', HttpStatus.UNAUTHORIZED);
+    }
+    return this.videoService.getAllPlaylists(userId);
   }
 
   @Get('stream/:id')
@@ -147,5 +192,15 @@ export class VideoController {
   @UseGuards(JwtAuthGuard)
   async getVideo(@Param('id') id: string) {
     return this.videoService.getVideoById(parseInt(id));
+  }
+
+  @Get('playlists/:id')
+  @UseGuards(JwtAuthGuard)
+  async getPlaylistById(@Param('id') id: string, @Req() req) {
+    const userId = req.user.id;
+    if (!userId) {
+      throw new HttpException('User ID not found in token', HttpStatus.UNAUTHORIZED);
+    }
+    return this.videoService.getPlaylistById(parseInt(id), userId);
   }
 }
