@@ -68,6 +68,11 @@ export class SsoService {
         throw new BadRequestException('無效的電子郵件格式');
       }
       
+      // 檢查provider是否支援
+      if (!this.providerDataMappers[ssoUserData.provider]) {
+        throw new BadRequestException(`不支援的SSO提供者: ${ssoUserData.provider}`);
+      }
+      
       // 資料清理與驗證
       const sanitizedData = {
         email: ssoUserData.email.toLowerCase().trim(),

@@ -105,10 +105,20 @@ export class SsoController {
 
   // 共用處理 SSO 登入後的重新導向邏輯
   private handleAuthRedirect(@Req() req, @Res() res: Response) {
-    const { accessToken, refreshToken } = req.user;
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-    
-    // 將 token 發送到前端 (使用查詢參數)
-    return res.redirect(`${frontendUrl}/auth/callback?token=${accessToken}&refreshToken=${refreshToken}`);
+    try {
+      const { accessToken, refreshToken } = req.user;
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+      
+      if (!frontendUrl) {
+        throw new Error('FRONTEND_URL 未設定');
+      }
+      
+      // 將 token 發送到前端 (使用查詢參數)
+      return res.redirect(`${frontendUrl}/auth/callback?token=${accessToken}&refreshToken=${refreshToken}`);
+    } catch (error) {
+      console.error('SSO重定向處理錯誤:', error);
+      const fallbackUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:4200';
+      return res.redirect(`${fallbackUrl}/auth/error?message=${encodeURIComponent('登入處理失敗')}`);
+    }
   }
 }
