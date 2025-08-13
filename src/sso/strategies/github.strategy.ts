@@ -15,11 +15,26 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
       clientSecret: configService.get('GITHUB_CLIENT_SECRET') || '',
       callbackURL: configService.get('GITHUB_CALLBACK_URL') || '',
       scope: ['user:email'],
+      passReqToCallback: true, // 將 request 物件傳遞給 validate 方法
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: any, done: any) {
+  async validate(req: any, accessToken: string, refreshToken: string, profile: any, done: any) {
     try {
+      // 驗證 state 參數
+      const { oauthState } = req.session;
+      if (oauthState && 
+          oauthState.value !== req.query.state || 
+          oauthState.provider !== 'github' ||
+          Date.now() - new Date(oauthState.createdAt).getTime() > 10 * 60 * 1000) { // 10分鐘過期
+        return done(new UnauthorizedException('無效的OAuth state'), null);
+      }
+      
+      // 清除已使用的 state
+      if (oauthState) {
+        delete req.session.oauthState;
+      }
+
       const user = await this.ssoService.validateOrCreateUser({
         email: profile.emails[0].value,
         firstName: profile.displayName?.split(' ')[0] || '',
